@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.yourcompany.expense_management.entity.Expense;
 import com.yourcompany.expense_management.repository.ExpenseRepository;
 
+@Service
 public class ExpenseService {
 
     @Autowired
@@ -21,7 +23,7 @@ public class ExpenseService {
         return expenseRepository.findById(id);
     }
 
-    public Expense savExpense(Expense expense) {
+    public Expense saveExpense(Expense expense) {
         return expenseRepository.save(expense);
     }
 
