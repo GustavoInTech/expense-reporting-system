@@ -15,6 +15,14 @@ public class Revenue {
 
     private Category category;
 
+    public Revenue(Long id, String description, BigDecimal amount, LocalDate date, Category category) {
+        this.id = id;
+        this.description = description;
+        this.amount = amount;
+        this.date = date;
+        this.category = category;
+    }
+
     /**
      * @return Long return the id
      */
