@@ -3,6 +3,7 @@ package com.yourcompany.expense_management.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yourcompany.expense_management.entity.Revenue;
@@ -11,11 +12,8 @@ import com.yourcompany.expense_management.repository.RevenueRepository;
 @Service
 public class RevenueService {
 
-    private final RevenueRepository revenueRepository;
-
-    public RevenueService(RevenueRepository revenueRepository) {
-        this.revenueRepository = revenueRepository;
-    }
+    @Autowired
+    private RevenueRepository revenueRepository;
 
     public Revenue createRevenue(Revenue revenue) {
         return revenueRepository.save(revenue);
