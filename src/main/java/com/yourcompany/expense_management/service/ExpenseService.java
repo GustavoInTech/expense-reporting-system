@@ -31,4 +31,17 @@ public class ExpenseService {
         expenseRepository.deleteById(id);
     }
 
+    public Optional<Object> updateExpense(Long id, Expense newExpenseData) {
+        return expenseRepository.findById(id)
+                .map(expense -> {
+                    expense.setDescription(newExpenseData.getDescription());
+                    expense.setAmount(newExpenseData.getAmount());
+                    expense.setCategory(newExpenseData.getCategory());
+                    expense.setDate(newExpenseData.getDate());
+                    return expenseRepository.save(expense);
+                });
+        // .orElseThrow(() -> new ResourceNotFoundException("Expense not found with id "
+        // + id));
+    }
+
 }

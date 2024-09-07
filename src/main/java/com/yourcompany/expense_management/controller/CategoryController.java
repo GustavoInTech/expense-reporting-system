@@ -1,7 +1,8 @@
 package com.yourcompany.expense_management.controller;
 
 import com.yourcompany.expense_management.entity.Category;
-import com.yourcompany.expense_management.repository.CategoryRepository;
+import com.yourcompany.expense_management.service.CategoryService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,57 +11,39 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/categories")
 public class CategoryController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
-    // Criar uma nova categoria
-    @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return categoryRepository.save(category);
-    }
-
-    // Listar todas as categorias
     @GetMapping
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        return categoryService.getAllCategories();
     }
 
-    // Buscar uma categoria pelo ID
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        if (category.isPresent()) {
-            return ResponseEntity.ok(category.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return categoryService.getCategoryById(id)
+                .map(category -> ResponseEntity.ok().body(category))
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // Atualizar uma categoria
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
-        Optional<Category> category = categoryRepository.findById(id);
-        if (category.isPresent()) {
-            Category updatedCategory = category.get();
-            updatedCategory.setName(categoryDetails.getName());
-            categoryRepository.save(updatedCategory);
-            return ResponseEntity.ok(updatedCategory);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PostMapping
+    public Category createCategory(@RequestBody Category category) {
+        return categoryService.saveCategory(category);
     }
 
-    // Deletar uma categoria
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        if (categoryRepository.existsById(id)) {
-            categoryRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Optional<Object>> updateCategory(@PathVariable Long id,
+            @RequestBody Category newCategoryData) {
+        Optional<Object> updatedCategory = categoryService.updateCategory(id, newCategoryData);
+        return ResponseEntity.ok(updatedCategory);
     }
 }
