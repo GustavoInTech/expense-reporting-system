@@ -32,22 +32,20 @@ public class Revenue {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    /*
-     * @ManyToOne
-     * 
-     * @JoinColumn(name = "user_id")
-     * private User user;
-     */
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Revenue() {
     }
 
-    public Revenue(Long id, String description, BigDecimal amount, LocalDate date, Category category) {
+    public Revenue(Long id, String description, BigDecimal amount, LocalDate date, Category category, User user) {
         this.id = id;
         this.description = description;
         this.amount = amount;
         this.date = date;
         this.category = category;
+        this.user = user;
     }
 
     /**
@@ -118,6 +116,14 @@ public class Revenue {
      */
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
 }
