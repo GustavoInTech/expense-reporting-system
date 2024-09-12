@@ -1,13 +1,12 @@
 package com.yourcompany.expense_management.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.yourcompany.expense_management.entity.Budget;
+import com.yourcompany.expense_management.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.yourcompany.expense_management.entity.Budget;
-import com.yourcompany.expense_management.repository.BudgetRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BudgetService {
@@ -15,42 +14,36 @@ public class BudgetService {
     @Autowired
     private BudgetRepository budgetRepository;
 
-    public Budget createBudget(Budget budget) {
+    public Budget save(Budget budget) {
         return budgetRepository.save(budget);
     }
 
-    public List<Budget> getAllBudgets() {
+    public List<Budget> findAll() {
         return budgetRepository.findAll();
     }
 
-    public Budget getBudgetById(Long id) {
-        Optional<Budget> budget = budgetRepository.findById(id);
-        if (budget.isPresent()) {
-            return budget.get();
-        } else {
-            throw new RuntimeException("Orçamento não encontrado com ID: " + id);
-        }
+    public Budget findById(Long id) {
+        return budgetRepository.findById(id).orElse(null);
     }
 
-    public Budget updateBudget(Long id, Budget budgetDetails) {
-        Optional<Budget> existingBudget = budgetRepository.findById(id);
-        if (existingBudget.isPresent()) {
-            Budget budget = existingBudget.get();
-            budget.setName(budgetDetails.getName());
-            budget.setAmount(budgetDetails.getAmount());
-            return budgetRepository.save(budget);
-        } else {
-            throw new RuntimeException("Orçamento não encontrado com ID: " + id);
-        }
+    public void deleteById(Long id) {
+        budgetRepository.deleteById(id);
     }
 
-    public void deleteBudget(Long id) {
-        Optional<Budget> existingBudget = budgetRepository.findById(id);
-        if (existingBudget.isPresent()) {
-            budgetRepository.delete(existingBudget.get());
+    public Budget update(Long id, Budget budgetDetails) {
+        Optional<Budget> optionalBudget = budgetRepository.findById(id);
+
+        if (optionalBudget.isPresent()) {
+            Budget existingBudget = optionalBudget.get();
+
+            existingBudget.setName(budgetDetails.getName());
+            existingBudget.setAmount(budgetDetails.getAmount());
+            existingBudget.setStartDate(budgetDetails.getStartDate());
+            existingBudget.setEndDate(budgetDetails.getEndDate());
+
+            return budgetRepository.save(existingBudget);
         } else {
-            throw new RuntimeException("Orçamento não encontrado com ID: " + id);
+            return null;
         }
     }
-
 }

@@ -1,17 +1,10 @@
 package com.yourcompany.expense_management.entity;
 
-import java.math.BigDecimal;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
 @Entity
-@Table(name = "budgets")
+@Table(name = "budget")
 public class Budget {
 
     @Id
@@ -22,84 +15,63 @@ public class Budget {
     private String name;
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private Double amount;
 
-    @Column(nullable = false)
-    private LocalDate starDate;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
-    @Column(nullable = false)
-    private LocalDate endData;
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
-    // Getters and Setters
+    // Construtores
+    public Budget() {
+    }
 
-    /**
-     * @return Long return the id
-     */
+    public Budget(String name, Double amount, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.amount = amount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    // Getters e Setters
     public Long getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * @return String return the name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * @param name the name to set
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * @return BigDecimal return the amount
-     */
-    public BigDecimal getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    /**
-     * @param amount the amount to set
-     */
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    /**
-     * @return LocalDate return the starDate
-     */
-    public LocalDate getStarDate() {
-        return starDate;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    /**
-     * @param starDate the starDate to set
-     */
-    public void setStarDate(LocalDate starDate) {
-        this.starDate = starDate;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    /**
-     * @return LocalDate return the endData
-     */
-    public LocalDate getEndData() {
-        return endData;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    /**
-     * @param endData the endData to set
-     */
-    public void setEndData(LocalDate endData) {
-        this.endData = endData;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
-
 }
