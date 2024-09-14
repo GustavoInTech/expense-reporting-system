@@ -1,6 +1,6 @@
 package com.yourcompany.expense_management.controller;
 
-import com.yourcompany.expense_management.entity.Budget;
+import com.yourcompany.expense_management.dto.BudgetDTO;
 import com.yourcompany.expense_management.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,30 +16,30 @@ public class BudgetController {
     private BudgetService budgetService;
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@RequestBody Budget budget) {
-        Budget newBudget = budgetService.save(budget);
+    public ResponseEntity<BudgetDTO> createBudget(@RequestBody BudgetDTO budgetDTO) {
+        BudgetDTO newBudget = budgetService.save(budgetDTO);
         return ResponseEntity.ok(newBudget);
     }
 
     @GetMapping
-    public ResponseEntity<List<Budget>> getAllBudgets() {
-        List<Budget> budgets = budgetService.findAll();
+    public ResponseEntity<List<BudgetDTO>> getAllBudgets() {
+        List<BudgetDTO> budgets = budgetService.findAll();
         return ResponseEntity.ok(budgets);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Budget> getBudgetById(@PathVariable Long id) {
-        Budget budget = budgetService.findById(id);
-        if (budget != null) {
-            return ResponseEntity.ok(budget);
+    public ResponseEntity<BudgetDTO> getBudgetById(@PathVariable Long id) {
+        BudgetDTO budgetDTO = budgetService.findById(id);
+        if (budgetDTO != null) {
+            return ResponseEntity.ok(budgetDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Budget> updateBudget(@PathVariable Long id, @RequestBody Budget budgetDetails) {
-        Budget updatedBudget = budgetService.update(id, budgetDetails);
+    public ResponseEntity<BudgetDTO> updateBudget(@PathVariable Long id, @RequestBody BudgetDTO budgetDTO) {
+        BudgetDTO updatedBudget = budgetService.update(id, budgetDTO);
         if (updatedBudget != null) {
             return ResponseEntity.ok(updatedBudget);
         } else {
@@ -49,8 +49,8 @@ public class BudgetController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBudget(@PathVariable Long id) {
-        Budget budget = budgetService.findById(id);
-        if (budget != null) {
+        BudgetDTO budgetDTO = budgetService.findById(id);
+        if (budgetDTO != null) {
             budgetService.deleteById(id);
             return ResponseEntity.noContent().build();
         } else {
