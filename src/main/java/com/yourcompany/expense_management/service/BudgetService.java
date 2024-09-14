@@ -1,5 +1,6 @@
 package com.yourcompany.expense_management.service;
 
+import com.yourcompany.expense_management.dto.BudgetDTO;
 import com.yourcompany.expense_management.entity.Budget;
 import com.yourcompany.expense_management.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
@@ -14,34 +16,61 @@ public class BudgetService {
     @Autowired
     private BudgetRepository budgetRepository;
 
-    public Budget save(Budget budget) {
-        return budgetRepository.save(budget);
+    // Método para converter Budget para BudgetDTO
+    private BudgetDTO convertToDTO(Budget budget) {
+        BudgetDTO dto = new BudgetDTO();
+        dto.setId(budget.getId());
+        dto.setName(budget.getName());
+        dto.setAmount(budget.getAmount());
+        dto.setStartDate(budget.getStartDate());
+        dto.setEndDate(budget.getEndDate());
+        return dto;
     }
 
-    public List<Budget> findAll() {
-        return budgetRepository.findAll();
+    // Método para converter BudgetDTO para Budget (entidade)
+    private Budget convertToEntity(BudgetDTO budgetDTO) {
+        Budget budget = new Budget();
+        budget.setName(budgetDTO.getName());
+        budget.setAmount(budgetDTO.getAmount());
+        budget.setStartDate(budgetDTO.getStartDate());
+        budget.setEndDate(budgetDTO.getEndDate());
+        return budget;
     }
 
-    public Budget findById(Long id) {
-        return budgetRepository.findById(id).orElse(null);
+    public BudgetDTO save(BudgetDTO budgetDTO) {
+        Budget budget = convertToEntity(budgetDTO);
+        Budget savedBudget = budgetRepository.save(budget);
+        return convertToDTO(savedBudget);
+    }
+
+    public List<BudgetDTO> findAll() {
+        List<Budget> budgets = budgetRepository.findAll();
+        return budgets.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public BudgetDTO findById(Long id) {
+        Optional<Budget> budget = budgetRepository.findById(id);
+        return budget.map(this::convertToDTO).orElse(null);
     }
 
     public void deleteById(Long id) {
         budgetRepository.deleteById(id);
     }
 
-    public Budget update(Long id, Budget budgetDetails) {
+    public BudgetDTO update(Long id, BudgetDTO budgetDTO) {
         Optional<Budget> optionalBudget = budgetRepository.findById(id);
 
         if (optionalBudget.isPresent()) {
             Budget existingBudget = optionalBudget.get();
+            existingBudget.setName(budgetDTO.getName());
+            existingBudget.setAmount(budgetDTO.getAmount());
+            existingBudget.setStartDate(budgetDTO.getStartDate());
+            existingBudget.setEndDate(budgetDTO.getEndDate());
 
-            existingBudget.setName(budgetDetails.getName());
-            existingBudget.setAmount(budgetDetails.getAmount());
-            existingBudget.setStartDate(budgetDetails.getStartDate());
-            existingBudget.setEndDate(budgetDetails.getEndDate());
-
-            return budgetRepository.save(existingBudget);
+            Budget updatedBudget = budgetRepository.save(existingBudget);
+            return convertToDTO(updatedBudget);
         } else {
             return null;
         }
