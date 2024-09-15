@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.yourcompany.expense_management.entity.Expense;
+import com.yourcompany.expense_management.dto.ExpenseDTO;
 import com.yourcompany.expense_management.service.ExpenseService;
 
 @RestController
@@ -26,22 +26,22 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping
-    public ResponseEntity<List<Expense>> getAllExpenses() {
-        return new ResponseEntity<>(expenseService.getAllExpenses(), HttpStatus.OK);
+    public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
+        List<ExpenseDTO> expenses = expenseService.getAllExpenses();
+        return new ResponseEntity<>(expenses, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Expense> getExpenseById(@PathVariable Long id) {
-        Optional<Expense> expense = expenseService.getExpenseById(id);
+    public ResponseEntity<ExpenseDTO> getExpenseById(@PathVariable Long id) {
+        Optional<ExpenseDTO> expense = expenseService.getExpenseById(id);
         return expense.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity
-                        .notFound()
-                        .build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Expense> createExpense(@RequestBody Expense expense) {
-        return new ResponseEntity<>(expenseService.saveExpense(expense), HttpStatus.CREATED);
+    public ResponseEntity<ExpenseDTO> createExpense(@RequestBody ExpenseDTO expenseDTO) {
+        ExpenseDTO newExpense = expenseService.saveExpense(expenseDTO);
+        return new ResponseEntity<>(newExpense, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -51,9 +51,10 @@ public class ExpenseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Optional<Object>> updateExpense(@PathVariable Long id, @RequestBody Expense newExpenseData) {
-        Optional<Object> updatedExpense = expenseService.updateExpense(id, newExpenseData);
-        return ResponseEntity.ok(updatedExpense);
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO newExpenseData) {
+        Optional<ExpenseDTO> updatedExpense = expenseService.updateExpense(id, newExpenseData);
+        return updatedExpense.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }
