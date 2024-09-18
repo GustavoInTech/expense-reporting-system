@@ -2,10 +2,14 @@ package com.yourcompany.expense_management.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.yourcompany.expense_management.dto.UserDTO;
 import com.yourcompany.expense_management.entity.User;
 import com.yourcompany.expense_management.repository.UserRepository;
 
@@ -15,42 +19,70 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // Converte User para UserDTO
+    private UserDTO convertToDto(User user) {
+        return modelMapper.map(user, UserDTO.class);
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-        // .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com
-        // ID: " + id));
+    // Converte UserDTO para User
+    private User convertToEntity(UserDTO userDTO) {
+        return modelMapper.map(userDTO, User.class);
     }
 
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<UserDTO> getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(this::convertToDto);
+    }
+
+    public UserDTO createUser(UserDTO userDTO) {
+
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new IllegalArgumentException("O email já está em uso.");
         }
-        if (userRepository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new IllegalArgumentException("O nome de usuário já está em uso.");
         }
-        return userRepository.save(user);
+
+        // Codifica a senha antes de salvar o usuário
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+        User user = convertToEntity(userDTO);
+        User savedUser = userRepository.save(user);
+
+        return convertToDto(savedUser);
     }
 
-    public User updateUser(Long id, User userDetails) {
+    public UserDTO updateUser(Long id, UserDTO userDetails) {
         Optional<User> optionalUser = userRepository.findById(id);
 
-        // Verifica se o usuário foi encontrado
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            // Atualizando os detalhes do usuário
+
             user.setUsername(userDetails.getUsername());
             user.setEmail(userDetails.getEmail());
-            user.setPassword(userDetails.getPassword());
 
-            // Salvando o usuário atualizado no banco de dados
-            return userRepository.save(user);
+            // Atualiza a senha apenas se ela foi fornecida
+            if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+            }
+
+            User updatedUser = userRepository.save(user);
+            return convertToDto(updatedUser);
         }
 
-        // Se o usuário não for encontrado, pode retornar nulo ou tratar de outra forma
         return null;
     }
 
@@ -60,7 +92,7 @@ public class UserService {
         if (user.isPresent()) {
             userRepository.delete(user.get());
         } else {
-            System.out.println("Usuário não encontrado com ID: " + id);
+            throw new IllegalArgumentException("Usuário não encontrado com ID: " + id);
         }
     }
 }

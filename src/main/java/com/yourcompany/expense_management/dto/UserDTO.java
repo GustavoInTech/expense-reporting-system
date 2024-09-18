@@ -1,12 +1,23 @@
 package com.yourcompany.expense_management.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class UserDTO {
 
     private Long id;
+
+    @NotBlank(message = "Username is required")
     private String username;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
 
-    // Construtor vazio
+    // Construtor padrão
     public UserDTO() {
     }
 
@@ -18,7 +29,6 @@ public class UserDTO {
     }
 
     // Getters e Setters
-
     public Long getId() {
         return id;
     }
@@ -33,6 +43,14 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {
